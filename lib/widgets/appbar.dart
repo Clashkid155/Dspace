@@ -1,4 +1,6 @@
+import 'package:filesize/filesize.dart';
 import 'package:flutter/material.dart';
+import 'package:size/size.dart';
 
 class AppBarr extends StatefulWidget implements PreferredSizeWidget {
   const AppBarr({Key? key}) : super(key: key);
@@ -13,6 +15,14 @@ class AppBarr extends StatefulWidget implements PreferredSizeWidget {
 class _AppBarrState extends State<AppBarr> {
   @override
   Widget build(BuildContext context) {
+    Sizes _size = Sizes();
+    int total_space = _size.getDiskCapacity('/home');
+
+    ///run/media/francis/Biggest
+    int avail_space = _size.getAvailableDiskSpace('/home');
+    double _percent = (total_space - avail_space) / total_space;
+    //print(_percent);
+
     return AppBar(
         // automaticallyImplyLeading: true,
         elevation: 0,
@@ -43,17 +53,17 @@ class _AppBarrState extends State<AppBarr> {
                     height: 10,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(20),
-                      child: const LinearProgressIndicator(
-                        backgroundColor: Color.fromRGBO(56, 86, 130, 100),
-                        color: Color.fromRGBO(82, 151, 255, 100),
-                        value: 0.5,
+                      child: LinearProgressIndicator(
+                        backgroundColor: const Color.fromRGBO(56, 86, 130, 100),
+                        color: const Color.fromRGBO(82, 151, 255, 100),
+                        value: _percent,
                         minHeight: 5,
                       ),
                     ),
                   ),
-                  const Text(
-                    "80GB/280GB",
-                    style: TextStyle(fontSize: 15),
+                  Text(
+                    '${filesize(avail_space)} / ${filesize(total_space)}',
+                    style: const TextStyle(fontSize: 15),
                   )
                 ],
               ),
