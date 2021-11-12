@@ -1,4 +1,5 @@
 import 'package:dspace/widgets/tab.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'function/functions.dart';
@@ -29,7 +30,8 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _() async {
-    dir = await dirs();
+    //compute(await dirs(), '/');
+    dir = await compute(dirs, (await home()).toString());
     setState(() {});
   }
 
@@ -43,10 +45,8 @@ class _MyAppState extends State<MyApp> {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: dir.isNotEmpty
-            ? Tabletest(
-                datasource: dir,
-              )
-            : const Center(child: CircularProgressIndicator()));
+        home: Tabletest(
+          datasource: dir,
+        ));
   }
 }
