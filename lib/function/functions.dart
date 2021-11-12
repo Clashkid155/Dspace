@@ -1,47 +1,44 @@
 import 'dart:io';
 
-import 'package:filesize/filesize.dart';
-import 'package:size/size.dart';
+import 'package:dspace/model/entity.dart';
 
-Future<List> dirs({String? path}) async {
-  print(Sizes().getAvailableDiskSpace('/'));
-  //print(await home());
-  var temp = Directory(path ??
-      await home()); // {'Directory': '', 'Path': '', 'Size': 0} '/run/media/francis/Biggest/francis/'
-  List data = [];
-  var fsize;
+Future<List> dirs(String? path) async {
+  var temp =
+      Directory(path ?? await home()); // '/run/media/francis/Biggest/francis/'
+
+  List el = [];
   await for (var e in temp.list()) {
-    print(e.path);
+    //print(e.path);
     // if (!(await Directory(e.path).is_empty())) {
     //Doesn't work with syslink
     //if (Directory(e.path) is Directory) {
     //print(siz.stdout);
-    fsize = await foldersize(e.path);
-    // print(fsize);
+
+    var fsize = await foldersize(e.path);
 
     //print(await FileSystemEntity.isDirectory(e.path));
     var dirname = e.path.split(Platform.pathSeparator).last;
-    data.add({
+    el.add(Entity(
+        path: e.path,
+        directory: dirname,
+        isDoc: await FileSystemEntity.isDirectory(e.path) ? true : false,
+        size: int.tryParse(fsize) as int));
+    /*data.add({
       'Directory': dirname,
-      'Path': e.path + Platform.pathSeparator,
+      'Path': e.path, //+ Platform.pathSeparator,
       'Size': int.tryParse(fsize), //?? filesize((await e.stat()).size),
       'isDoc': await FileSystemEntity.isDirectory(e.path) ? true : false,
-    });
+    });*/
   }
   // }
-  data.sort((b, a) => a['Size'].compareTo(b['Size']));
-  data.forEach((element) {
-    //print(element['Documents']);
-    element['Size'] = filesize(element['Size']);
-  });
-
-  return data;
+  el.sort((b, a) => a.size.compareTo(b.size));
+  return el;
 }
 
 Future home() async {
   Map env = Platform.environment;
   String home = '';
-  Map<String, String> envVars = Platform.environment;
+  //Map<String, String> envVars = Platform.environment;
 
   if (Platform.isLinux || Platform.isMacOS) {
     home = env['HOME'];
@@ -64,4 +61,8 @@ Future foldersize(String path) async {
   // si = siz.stdout.toString().split('/')[0].trim() + 'B';
   si = siz.stdout.toString().split('/')[0].trim();
   return si;
+}
+
+Future<void> delete(String path) async {
+  await Directory(path).delete(recursive: true);
 }
